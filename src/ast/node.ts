@@ -54,8 +54,13 @@ export default class Node implements AstType {
   }
 
   resolve(config: Config = {}): Node {
+    const schema = this.findSchema(config) ?? {};
+
     return Object.assign(new Node(), this, {
-      children: this.children.map((child) => child.resolve(config)),
+      children:
+        schema.resolveChildren === false
+          ? this.children
+          : this.children.map((child) => child.resolve(config)),
       attributes: resolve(this.attributes, config),
       slots: Object.fromEntries(
         Object.entries(this.slots).map(([name, slot]) => [
