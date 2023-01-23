@@ -107,6 +107,7 @@ export type Schema<C extends Config = Config, R = string> = {
   slots?: Record<string, SchemaSlot>;
   selfClosing?: boolean;
   inline?: boolean;
+  resolveChildren?: boolean;
   transform?(node: Node, config: C): MaybePromise<RenderableTreeNodes>;
   validate?(node: Node, config: C): MaybePromise<ValidationError[]>;
   description?: string;
