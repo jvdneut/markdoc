@@ -4,7 +4,7 @@
   "version": "0.4.1",
   "description": "A text markup language for documentation",
   "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "module": "./index.ts",
   "types": "dist/index.d.ts",
   "files": [
     "index.ts",
