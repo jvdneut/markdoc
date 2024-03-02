@@ -12,6 +12,6 @@ export default class Variable implements AstType {
   resolve({ variables }: Config = {}) {
     return variables instanceof Function
       ? variables(this.path)
-      : this.path.reduce((obj = {}, key) => obj[key], variables);
+      : this.path.reduce((obj = {}, key) => (obj ? obj[key] : obj), variables);
   }
 }
