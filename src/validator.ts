@@ -198,7 +198,7 @@ export default function validator(node: Node, config: Config) {
         let variables = config.variables;
 
         for (const key of value.path) {
-          if (!Object.prototype.hasOwnProperty.call(variables, key)) {
+          if (!Object.prototype.hasOwnProperty.call(variables || {}, key)) {
             missing = true;
             break;
           }
