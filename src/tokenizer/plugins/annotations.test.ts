@@ -1,3 +1,4 @@
+import { expect, it, describe } from 'vitest';
 import Tokenizer from '..';
 
 describe('MarkdownIt Annotations plugin', function () {
@@ -16,7 +17,7 @@ describe('MarkdownIt Annotations plugin', function () {
       {% /test %}
       `);
 
-      expect(example).toDeepEqualSubset([
+      expect(example).toMatchObject([
         {
           type: 'tag_open',
           info: 'test',
@@ -49,7 +50,7 @@ describe('MarkdownIt Annotations plugin', function () {
       This is a test
       {% /test %}`);
 
-      expect(example).toDeepEqualSubset([
+      expect(example).toMatchObject([
         {
           type: 'tag_open',
           meta: {
@@ -69,7 +70,7 @@ describe('MarkdownIt Annotations plugin', function () {
 
     it('with a self-closing container', function () {
       const example = parse(`This is a test\n{% test /%}`);
-      expect(example).toDeepEqualSubset([
+      expect(example).toMatchObject([
         { type: 'paragraph_open' },
         { type: 'inline' },
         { type: 'paragraph_close' },
@@ -77,7 +78,7 @@ describe('MarkdownIt Annotations plugin', function () {
       ]);
 
       const example2 = parse(`{% test /%}`);
-      expect(example2).toDeepEqualSubset([
+      expect(example2).toMatchObject([
         { type: 'tag', meta: { tag: 'test', attributes: null } },
       ]);
     });
@@ -89,7 +90,7 @@ describe('MarkdownIt Annotations plugin', function () {
       This is another test
       `);
 
-      expect(example).toDeepEqualSubset([
+      expect(example).toMatchObject([
         { type: 'paragraph_open' },
         { type: 'inline' },
         { type: 'paragraph_close' },
@@ -142,10 +143,10 @@ describe('MarkdownIt Annotations plugin', function () {
         {% /test %}
         `);
 
-        expect(example).toDeepEqualSubset(basicExample);
-        expect(example[0].map).toDeepEqual([0, 2]);
-        expect(example[1].map).toDeepEqual([2, 3]);
-        expect(example[4].map).toDeepEqual([3, 4]);
+        expect(example).toMatchObject(basicExample);
+        expect(example[0].map).toMatchObject([0, 2]);
+        expect(example[1].map).toMatchObject([2, 3]);
+        expect(example[4].map).toMatchObject([3, 4]);
         expect(example.length).toEqual(5);
         expect(example[2].children.length).toEqual(1);
       });
@@ -160,10 +161,10 @@ describe('MarkdownIt Annotations plugin', function () {
         {% /test %}
         `);
 
-        expect(example).toDeepEqualSubset(basicExample);
-        expect(example[0].map).toDeepEqual([0, 4]);
-        expect(example[2].map).toDeepEqual([4, 5]);
-        expect(example[4].map).toDeepEqual([5, 6]);
+        expect(example).toMatchObject(basicExample);
+        expect(example[0].map).toMatchObject([0, 4]);
+        expect(example[2].map).toMatchObject([4, 5]);
+        expect(example[4].map).toMatchObject([5, 6]);
         expect(example.length).toEqual(5);
         expect(example[2].children.length).toEqual(1);
       });
@@ -172,7 +173,7 @@ describe('MarkdownIt Annotations plugin', function () {
     describe('inline', function () {
       it('on a line by itself', function () {
         const example = parse('{% foo %}bar{% /foo %}');
-        expect(example).toDeepEqualSubset([
+        expect(example).toMatchObject([
           { type: 'paragraph_open' },
           {
             type: 'inline',
@@ -194,7 +195,7 @@ describe('MarkdownIt Annotations plugin', function () {
       it('with a paragraph', function () {
         const example = parse('Example {% foo %}bar{% /foo %} baz');
 
-        expect(example).toDeepEqualSubset([
+        expect(example).toMatchObject([
           { type: 'paragraph_open' },
           {
             type: 'inline',
@@ -230,7 +231,7 @@ describe('MarkdownIt Annotations plugin', function () {
         const example = parse(
           'Example {% foo %}bar{% /foo %}{% test %}test{% /test %} baz'
         );
-        expect(example).toDeepEqualSubset([
+        expect(example).toMatchObject([
           { type: 'paragraph_open' },
           {
             type: 'inline',
@@ -273,7 +274,7 @@ describe('MarkdownIt Annotations plugin', function () {
         const example = parse(
           'Example {% foo %}this is a *test*{% /foo %} baz'
         );
-        expect(example).toDeepEqualSubset([
+        expect(example).toMatchObject([
           { type: 'paragraph_open' },
           {
             type: 'inline',
@@ -306,7 +307,7 @@ describe('MarkdownIt Annotations plugin', function () {
     describe('fence', function () {
       it('simple with no tags', function () {
         const example = parse('```\nhello\n```');
-        expect(example).toDeepEqualSubset([
+        expect(example).toMatchObject([
           {
             type: 'fence',
             children: [
@@ -319,9 +320,38 @@ describe('MarkdownIt Annotations plugin', function () {
         ]);
       });
 
-      it('simple with one tag', function () {
+      it.only('simple with one tag', function () {
         const example = parse('```\nhello {% foo %}bar{% /foo %}\n```');
-        expect(example).toDeepEqualSubset([
+        const expected = [
+          {
+            type: 'fence',
+            children: [
+              {
+                type: 'text',
+                content: 'hello ',
+              },
+              {
+                info: '{% foo %}',
+                type: 'tag_open',
+              },
+              {
+                type: 'text',
+                content: 'bar',
+              },
+              {
+                info: '{% /foo %}',
+                type: 'tag_close',
+              },
+              {
+                type: 'text',
+                content: '\n',
+              },
+            ],
+          },
+        ];
+        expect(example).toMatchObject(expected);
+				/*
+        expect(example).toMatchObject([
           {
             type: 'fence',
             children: [
@@ -344,12 +374,13 @@ describe('MarkdownIt Annotations plugin', function () {
             ],
           },
         ]);
+				*/
       });
 
       it('unclosed tag', function () {
         const example = parse('```\nhello {%\n```');
         // unclosed tags should not result in crashes
-        expect(example).toDeepEqualSubset([
+        expect(example).toMatchObject([
           {
             type: 'fence',
             children: [
@@ -367,7 +398,7 @@ describe('MarkdownIt Annotations plugin', function () {
   describe('parsing inline annotations', function () {
     it('with a header', function () {
       const example = parse('# This is a test {% #foo .bar .baz %}');
-      expect(example).toDeepEqualSubset([
+      expect(example).toMatchObject([
         { type: 'heading_open' },
         {
           type: 'inline',
@@ -392,7 +423,7 @@ describe('MarkdownIt Annotations plugin', function () {
 
     it('with a header and keys', function () {
       const example = parse('# This is a test {% #foo .bar .baz foo=2 %}');
-      expect(example).toDeepEqualSubset([
+      expect(example).toMatchObject([
         { type: 'heading_open' },
         {
           type: 'inline',

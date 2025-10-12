@@ -1,3 +1,4 @@
+import { expect, it, describe } from 'vitest';
 import Tokenizer from '..';
 
 describe('MarkdownIt frontmatter plugin', function () {
@@ -18,7 +19,8 @@ describe('MarkdownIt frontmatter plugin', function () {
     `);
 
     expect(example.length).toEqual(4);
-    expect(example[0]).toDeepEqualSubset({
+    //expect(example[0]).toDeepEqualSubset({
+    expect(example[0]).toMatchObject({
       type: 'frontmatter',
       content: 'test: true',
       level: 0,
@@ -35,7 +37,7 @@ describe('MarkdownIt frontmatter plugin', function () {
     `);
 
     expect(example.length).toEqual(1);
-    expect(example[0]).toDeepEqualSubset({
+    expect(example[0]).toMatchObject({
       type: 'frontmatter',
       level: 0,
       map: [0, 3],
@@ -52,7 +54,7 @@ describe('MarkdownIt frontmatter plugin', function () {
     `);
 
     expect(example.length).toEqual(4);
-    expect(example[0]).toDeepEqualSubset({
+    expect(example[0]).toMatchObject({
       type: 'frontmatter',
       content: 'test: true',
       level: 0,
