@@ -13,6 +13,7 @@ import transformer, { globalAttributes } from './src/transformer';
 import transforms from './src/transforms';
 import { parseTags } from './src/utils';
 import validator, { validateTree } from './src/validator';
+import { resolveInheritance } from './src/inheritance';
 
 import type { ParserArgs } from './src/types';
 import type Token from 'markdown-it/lib/token';
@@ -122,6 +123,7 @@ export {
   validator,
   truthy,
   format,
+  resolveInheritance,
 };
 
 export default class Markdoc {
@@ -140,6 +142,7 @@ export default class Markdoc {
   static parse = parse;
   static transform = transform;
   static validate = validate;
+  static resolveInheritance = resolveInheritance;
   static createElement = createElement;
   static truthy = truthy;
   static format = format;

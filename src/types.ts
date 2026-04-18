@@ -28,6 +28,7 @@ export type ConfigType<R = string> = Partial<{
   variables: Record<string, any>;
   functions: Record<string, ConfigFunction>;
   partials: Record<string, any>;
+  templates: Record<string, Node>;
   validation?: {
     parents?: Node[];
     validateFunctions?: boolean;
