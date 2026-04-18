@@ -25,6 +25,13 @@ export default class Tokenizer {
     if (config.allowComments) this.parser.use(comments, 'comments', {});
   }
 
+  use(plugin: MarkdownIt.PluginSimple): this;
+  use<T>(plugin: MarkdownIt.PluginWithOptions<T>, options?: T): this;
+  use(plugin: any, ...options: any[]): this {
+    this.parser.use(plugin, ...options);
+    return this;
+  }
+
   tokenize(content: string): Token[] {
     return this.parser.parse(content.toString(), {});
   }

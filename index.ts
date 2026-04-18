@@ -14,6 +14,7 @@ import transforms from './src/transforms';
 import { parseTags } from './src/utils';
 import validator, { validateTree } from './src/validator';
 import { resolveInheritance } from './src/inheritance';
+import { tagMeta } from './src/tokenizer/tagMeta';
 
 import type { ParserArgs } from './src/types';
 import type Token from 'markdown-it/lib/token';
@@ -124,6 +125,7 @@ export {
   truthy,
   format,
   resolveInheritance,
+  tagMeta,
 };
 
 export default class Markdoc {
@@ -143,6 +145,7 @@ export default class Markdoc {
   static transform = transform;
   static validate = validate;
   static resolveInheritance = resolveInheritance;
+  static tagMeta = tagMeta;
   static createElement = createElement;
   static truthy = truthy;
   static format = format;
