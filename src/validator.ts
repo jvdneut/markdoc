@@ -296,19 +296,26 @@ export default function validator(node: Node, config: Config) {
 
 export function* walkWithParents(
   node: Node,
+  config: Config,
   parents: Node[] = []
-): Generator<[Node, Node[]]> {
-  yield [node, parents];
+): Generator<[Node, Node[], Config]> {
+  yield [node, parents, config];
+  const schema = node.findSchema(config) ?? {};
+  const childConfig =
+    typeof schema.validateChildren === 'function'
+      ? schema.validateChildren(node, config)
+      : config;
   for (const child of [...Object.values(node.slots), ...node.children])
-    yield* walkWithParents(child, [...parents, node]);
+    yield* walkWithParents(child, childConfig, [...parents, node]);
 }
 
 export function validateTree(content: Node, config: Config) {
-  const output = [...walkWithParents(content)].map(([node, parents]) => {
+  const output = [...walkWithParents(content, config)].map(
+    ([node, parents, nodeConfig]) => {
     const { type, lines, location } = node;
     const updatedConfig = {
-      ...config,
-      validation: { ...config.validation, parents },
+      ...nodeConfig,
+      validation: { ...nodeConfig.validation, parents },
     };
     const errors = validator(node, updatedConfig);
 
