@@ -301,12 +301,15 @@ export function* walkWithParents(
 ): Generator<[Node, Node[], Config]> {
   yield [node, parents, config];
   const schema = node.findSchema(config) ?? {};
-  const childConfig =
-    typeof schema.validateChildren === 'function'
-      ? schema.validateChildren(node, config)
-      : config;
-  for (const child of [...Object.values(node.slots), ...node.children])
-    yield* walkWithParents(child, childConfig, [...parents, node]);
+  if (typeof schema.validateChildren === 'function') {
+    const result = schema.validateChildren(node, config);
+    if (Array.isArray(result)) return;
+    for (const child of [...Object.values(node.slots), ...node.children])
+      yield* walkWithParents(child, result, [...parents, node]);
+  } else {
+    for (const child of [...Object.values(node.slots), ...node.children])
+      yield* walkWithParents(child, config, [...parents, node]);
+  }
 }
 
 export function validateTree(content: Node, config: Config) {
