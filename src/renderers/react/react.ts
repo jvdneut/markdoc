@@ -1,5 +1,5 @@
 import Tag from '../../tag';
-import { RenderableTreeNodes, Scalar } from '../../types';
+import type { RenderableTreeNodes, Scalar } from '../../types';
 
 import type { createElement, ComponentType, Fragment, ReactNode } from 'react';
 

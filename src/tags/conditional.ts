@@ -1,6 +1,6 @@
 import { isPromise } from '../utils';
 
-import {
+import type {
   MaybePromise,
   Node,
   RenderableTreeNode,

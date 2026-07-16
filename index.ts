@@ -22,7 +22,11 @@ import type { Config, RenderableTreeNode, ValidateError } from './src/types';
 
 export * from './src/types';
 
-const tokenizer = new Tokenizer();
+// Lazily initialized so that consumers importing only transform/render-side
+// exports (e.g. `transform`, `Ast`, `Tag`) can tree-shake the parser and
+// markdown-it out of their bundles — a top-level `new Tokenizer()` defeats
+// that, since bundlers can't prove the constructor pure.
+let tokenizer: Tokenizer | undefined;
 
 function mergeConfig(config: Config = {}): Config {
   return {
@@ -46,7 +50,8 @@ export function parse(
   content: string | Token[],
   args?: string | ParserArgs
 ): Node {
-  if (typeof content === 'string') content = tokenizer.tokenize(content);
+  if (typeof content === 'string')
+    content = (tokenizer ??= new Tokenizer()).tokenize(content);
   return parser(content, args);
 }
 
