@@ -111,6 +111,35 @@ describe('React dynamic renderer', function () {
       const output = dynamic(example, React);
       expect(output).toDeepEqualSubset(example);
     });
+
+    // A custom component's attribute can itself be an array of Tags (e.g. a
+    // slot rendered into a prop rather than into `children`) — each needs its
+    // own `key`, since the consumer typically renders that array directly
+    // rather than through this renderer's own (key-free, spread-args)
+    // children path.
+    it('with an array-of-tags attribute value, each item gets a key', function () {
+      const example = new Tag('Custom', {
+        items: [
+          new Tag('p', undefined, ['one']),
+          new Tag('p', undefined, ['two']),
+        ],
+      });
+
+      const output = dynamic(example, React);
+      expect(output.attributes.items[0].attributes.key).toBe(0);
+      expect(output.attributes.items[1].attributes.key).toBe(1);
+    });
+
+    it('children rendering stays key-free (spread args need none)', function () {
+      const example = new Tag('div', undefined, [
+        new Tag('p', undefined, ['one']),
+        new Tag('p', undefined, ['two']),
+      ]);
+
+      const output = dynamic(example, React);
+      expect(output.children[0].attributes).toBe(null);
+      expect(output.children[1].attributes).toBe(null);
+    });
   });
 
   describe('rendering built-in nodes', function () {

@@ -9,6 +9,7 @@ type ReactShape = Readonly<{
 }>;
 
 type Component = ComponentType<any>;
+type Key = string | number;
 
 function tagName(
   name: string,
@@ -35,7 +36,17 @@ export default function dynamic(
   function deepRender(value: any): any {
     if (value == null || typeof value !== 'object') return value;
 
-    if (Array.isArray(value)) return value.map((item) => deepRender(item));
+    // An array *attribute value* (e.g. a slot rendered into a custom
+    // component's prop) becomes a plain array of React nodes here, which the
+    // consumer typically renders directly (`{prop}`) rather than through
+    // this renderer's own Fragment-wrapping array branch below — so, unlike
+    // that branch, each Tag item needs its own key or React warns ("Each
+    // child in a list should have a unique key prop") the first time the
+    // array holds more than one Tag.
+    if (Array.isArray(value))
+      return value.map((item, index) =>
+        Tag.isTag(item) ? render(item, index) : deepRender(item)
+      );
 
     if (value.$$mdtype === 'Tag') return render(value);
 
@@ -46,9 +57,13 @@ export default function dynamic(
     return output;
   }
 
-  function render(node: RenderableTreeNodes): ReactNode {
+  function render(node: RenderableTreeNodes, key?: Key): ReactNode {
     if (Array.isArray(node))
-      return React.createElement(React.Fragment, null, ...node.map(render));
+      return React.createElement(
+        React.Fragment,
+        null,
+        ...node.map((child) => render(child))
+      );
 
     if (node === null || typeof node !== 'object' || !Tag.isTag(node))
       return node;
@@ -61,10 +76,13 @@ export default function dynamic(
 
     if (className) attrs.className = className;
 
+    const props =
+      Object.keys(attrs).length == 0 ? undefined : deepRender(attrs);
+
     return React.createElement(
       resolveTagName(name, components),
-      Object.keys(attrs).length == 0 ? null : deepRender(attrs),
-      ...children.map(render)
+      key == null ? props ?? null : { ...props, key },
+      ...children.map((child) => render(child))
     );
   }
 
