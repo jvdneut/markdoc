@@ -1,7 +1,7 @@
 {
   "name": "@jvdneut/markdoc",
   "author": "Ryan Paul",
-  "version": "0.5.4-loops-3",
+  "version": "0.5.4-loops-4",
   "description": "A text markup language for documentation",
   "main": "dist/index.js",
   "module": "./index.ts",
