@@ -65,8 +65,14 @@ export default function dynamic(
         ...node.map((child) => render(child))
       );
 
+    // Everything that is not a Tag is returned as-is. Scalar includes
+    // `{ [key: string]: Scalar }`, which is NOT a ReactNode — a plain object
+    // reaching a child position makes React throw "Objects are not valid as a
+    // React child". Asserted rather than filtered on purpose: a tree holding a
+    // bare object is malformed, and React's error names the problem where
+    // returning null would silently drop content instead.
     if (node === null || typeof node !== 'object' || !Tag.isTag(node))
-      return node;
+      return node as ReactNode;
 
     const {
       name,

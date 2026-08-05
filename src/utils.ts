@@ -71,6 +71,16 @@ function parseTag(content: string, line: number, contentStart: number) {
 
 export function parseTags(content: string, firstLine = 0): Token[] {
   let line = firstLine + 1;
+  // NOT markdown-it Tokens, asserted as such at the return. These carry EXTRA
+  // fields Token does not declare (`start`, `end`, `position`, `info`) and OMIT
+  // required ones (`tag`, `attrs`, `nesting`, `level`, `children`, `markup`,
+  // `meta`, `block`, `hidden`) — so the two shapes overlap rather than nest, and
+  // no built-in type describes them.
+  //
+  // They do reach markdown-it: annotations.ts assigns them to `token.children`.
+  // The shape is therefore load-bearing, and completing it would change what
+  // downstream code sees for no benefit that exists today. Left exactly as it
+  // was, with the mismatch stated instead of implied.
   const output = [];
   let start = 0;
 
@@ -131,5 +141,5 @@ export function parseTags(content: string, firstLine = 0): Token[] {
     content: content.slice(start),
   });
 
-  return output;
+  return output as unknown as Token[];
 }
