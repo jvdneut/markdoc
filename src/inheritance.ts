@@ -6,7 +6,7 @@ function parseExtends(frontmatter?: string): string | undefined {
   return match?.[1];
 }
 
-function collectBlocks(node: Node): Record<string, Node> {
+export function collectBlocks(node: Node): Record<string, Node> {
   const blocks: Record<string, Node> = {};
   for (const child of node.walk()) {
     if (child.tag === 'block' && typeof child.attributes.name === 'string') {
@@ -25,7 +25,10 @@ function substituteBlocks(node: Node, blocks: Record<string, Node>): Node {
   return Object.assign(new Node(), node, {
     children: node.children.map((c) => substituteBlocks(c, blocks)),
     slots: Object.fromEntries(
-      Object.entries(node.slots).map(([k, v]) => [k, substituteBlocks(v, blocks)])
+      Object.entries(node.slots).map(([k, v]) => [
+        k,
+        substituteBlocks(v, blocks),
+      ])
     ),
   });
 }
